@@ -21,13 +21,16 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF111827), // Dark gray-900
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1F2937), // Dark gray-800
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: theme.appBarTheme.foregroundColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -35,13 +38,13 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
             Text(
               widget.document.name,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: theme.appBarTheme.foregroundColor, fontSize: 16),
             ),
             if (_totalPages > 0)
               Text(
                 'Page $_currentPage of $_totalPages',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   fontSize: 12,
                 ),
               ),

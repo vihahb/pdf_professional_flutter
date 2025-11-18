@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
-import 'editor_screen.dart';
+import '../editor_screen.dart';
 
 class ScanDocumentScreen extends StatefulWidget {
   const ScanDocumentScreen({super.key});
@@ -73,17 +73,15 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      // Reinitialize camera when app resumes from background
       if (_cameraController != null && !_cameraController!.value.isInitialized) {
-        _cameraController!.initialize().then((_) {
-          if (mounted) {
-            setState(() {
-              _isCameraReady = true;
-            });
-          }
-        });
+        _reinitializeCamera();
       }
     } else if (state == AppLifecycleState.paused) {
-      _cameraController?.dispose();
+      // Only dispose if camera is initialized (actual app pause, not route change)
+      if (_cameraController != null && _cameraController!.value.isInitialized) {
+        _cameraController?.dispose();
+      }
     }
   }
 
@@ -174,6 +172,61 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
     }
   }
 
+  Future<void> _changeResolution() async {
+    final resolutions = [
+      ResolutionPreset.low,
+      ResolutionPreset.medium,
+      ResolutionPreset.high,
+      ResolutionPreset.veryHigh,
+      ResolutionPreset.ultraHigh,
+      ResolutionPreset.max,
+    ];
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Camera Resolution'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: resolutions.map((preset) {
+              return ListTile(
+                title: Text(preset.toString().split('.').last),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _updateCameraResolution(preset);
+                },
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _updateCameraResolution(ResolutionPreset preset) async {
+    try {
+      await _cameraController?.dispose();
+      _cameraController = CameraController(
+        _cameras![0],
+        preset,
+        enableAudio: false,
+      );
+      await _cameraController!.initialize();
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error changing resolution: $e')),
+        );
+      }
+    }
+  }
+
   void _openEditor() {
     Navigator.push(
       context,
@@ -181,8 +234,8 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
         builder: (context) => EditorScreen(
           scannedImages: _scannedImages,
           onAddPage: () {
-            Navigator.pop(context);
-            setState(() {});
+            // Reinitialize camera when returning to add more pages
+            _reinitializeCamera();
           },
           onBack: () {
             setState(() {
@@ -192,6 +245,54 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
         ),
       ),
     );
+  }
+
+  Future<void> _reinitializeCamera() async {
+    try {
+      // If controller exists and is initialized, just setState and return
+      if (_cameraController != null && _cameraController!.value.isInitialized) {
+        if (mounted) {
+          setState(() {});
+        }
+        return;
+      }
+
+      // If controller doesn't exist, create it
+      if (_cameraController == null) {
+        if (_cameras == null || _cameras!.isEmpty) {
+          _cameras = await availableCameras();
+        }
+
+        if (_cameras == null || _cameras!.isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('No camera available')),
+            );
+          }
+          return;
+        }
+
+        _cameraController = CameraController(
+          _cameras![0],
+          ResolutionPreset.high,
+          enableAudio: false,
+        );
+      }
+
+      // Initialize the controller
+      await _cameraController!.initialize();
+      if (mounted) {
+        setState(() {
+          _isCameraReady = true;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error reinitializing camera: $e')),
+        );
+      }
+    }
   }
 
   Map<String, double> _getResponsiveDimensions(BuildContext context) {
@@ -234,20 +335,27 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.5),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  Expanded(child: const Text(
                     'Scan Document',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
-                  ),
+                  )),
+                  IconButton( onPressed: _changeResolution, icon: const Icon(Icons.settings, color: Colors.white, size: 24), tooltip: 'Change Resolution', ),
                 ],
               ),
             ),
+          ),
+
+          Stack(
+            children: [
+
+            ],
           ),
 
           // Live Camera Stream with Guide Overlay
@@ -384,71 +492,64 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
               ],
             ),
           ),
-
           // Bottom Controls
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.6),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Gallery button
-                  IconButton(
-                    onPressed: _pickFromGallery,
-                    icon: const Icon(Icons.photo_library,
-                        color: Colors.white, size: 28),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      padding: const EdgeInsets.all(12),
-                    ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Gallery button
+                IconButton(
+                  onPressed: _pickFromGallery,
+                  icon: const Icon(Icons.photo_library,
+                      color: Colors.white, size: 28),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
+                    padding: const EdgeInsets.all(12),
                   ),
+                ),
 
-                  // Capture button
-                  GestureDetector(
-                    onTap: _captureImage,
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2563EB),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.white.withValues(alpha: 0.4),
-                            blurRadius: 12,
-                            spreadRadius: 6,
-                          ),
-                          BoxShadow(
-                            color: const Color(0xFF2563EB).withValues(alpha: 0.5),
-                            blurRadius: 20,
-                            spreadRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 36,
-                      ),
+                // Capture button
+                GestureDetector(
+                  onTap: _captureImage,
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2563EB),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          spreadRadius: 6,
+                        ),
+                        BoxShadow(
+                          color: const Color(0xFF2563EB).withValues(alpha: 0.5),
+                          blurRadius: 20,
+                          spreadRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 36,
                     ),
                   ),
+                ),
 
-                  // Flip camera button
-                  IconButton(
-                    onPressed: _switchCamera,
-                    icon: const Icon(Icons.flip_camera_android,
-                        color: Colors.white, size: 28),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      padding: const EdgeInsets.all(12),
-                    ),
+                // Flip camera button
+                IconButton(
+                  onPressed: _switchCamera,
+                  icon: const Icon(Icons.flip_camera_android,
+                      color: Colors.white, size: 28),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
+                    padding: const EdgeInsets.all(12),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

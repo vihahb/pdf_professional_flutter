@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pdf_professional_flutter/screens/scan_document_screen_new.dart';
+import 'package:pdf_professional_flutter/screens/scan/scan_document_screen_new.dart';
 import 'package:pdf_professional_flutter/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 import '../../providers/premium_provider.dart';
 import '../../services/ad_service.dart';
+import '../../config/app_theme.dart';
 import 'pdf_list_screen.dart';
-import 'scan_document_screen.dart';
 import 'converter_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -55,15 +55,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: _screens[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.appBarTheme.backgroundColor ?? Colors.white,
           border: Border(
-            top: BorderSide(color: const Color(0xFFE5E7EB), width: 1),
+            top: BorderSide(
+              color: isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+              width: 1,
+            ),
           ),
         ),
         child: SafeArea(
@@ -126,7 +131,12 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? const Color(0xFF2563EB) : const Color(0xFF4B5563);
+    final theme = Theme.of(context);
+    final color = isSelected
+        ? AppTheme.primaryColor
+        : (theme.brightness == Brightness.dark
+            ? const Color(0xFF9CA3AF)
+            : const Color(0xFF4B5563));
 
     return Expanded(
       child: Material(

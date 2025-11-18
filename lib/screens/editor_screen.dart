@@ -9,6 +9,7 @@ import 'package:image/image.dart' as img;
 import '../../providers/pdf_provider.dart';
 import '../../providers/premium_provider.dart';
 import '../../services/ad_service.dart';
+import '../../config/app_theme.dart';
 
 class EditorScreen extends StatefulWidget {
   final List<File> scannedImages;
@@ -90,8 +91,8 @@ class _EditorScreenState extends State<EditorScreen> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Crop Image',
-            toolbarColor: const Color(0xFF2563EB),
-            toolbarWidgetColor: Colors.white,
+            toolbarColor:   Colors.white,
+            toolbarWidgetColor: Colors.grey[900],
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
             hideBottomControls: false,
@@ -118,7 +119,7 @@ class _EditorScreenState extends State<EditorScreen> {
 
         imageCache.clear();
         imageCache.clearLiveImages();
-
+        _scannedImages[_currentImageIndex] = imageFile;
         setState(() {});
 
         if (mounted) {
@@ -263,18 +264,24 @@ class _EditorScreenState extends State<EditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.grey[700]),
-          onPressed: widget.onBack,
+          icon: Icon(Icons.close, color: theme.appBarTheme.foregroundColor),
+          onPressed: (){
+            Navigator.pop(context, _scannedImages);
+            widget.onBack.call();
+          },
         ),
         title: Text(
           '${_scannedImages.length} ${_scannedImages.length == 1 ? 'Page' : 'Pages'}',
-          style: TextStyle(color: Colors.grey[900]),
+          style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
         actions: [
           TextButton(
@@ -285,12 +292,12 @@ class _EditorScreenState extends State<EditorScreen> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text(
+                : Text(
                     'Save',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Color(0xFF2563EB),
+                      color: AppTheme.primaryColor,
                     ),
                   ),
           ),
@@ -302,14 +309,14 @@ class _EditorScreenState extends State<EditorScreen> {
           // Current Page Preview
           Expanded(
             child: Container(
-              color: Colors.grey[200],
+              color: isDarkMode ? const Color(0xFF1F2937) : Colors.grey[200],
               padding: const EdgeInsets.all(16),
               child: Center(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(5),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.1),
@@ -319,14 +326,15 @@ class _EditorScreenState extends State<EditorScreen> {
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(5),
                     child: AspectRatio(
-                      aspectRatio: 8.5 / 11,
+                      aspectRatio: 9 / 11,
                       child: _currentImageIndex >= 0 &&
                               _currentImageIndex < _scannedImages.length
                           ? Image.file(
                               _scannedImages[_currentImageIndex],
                               fit: BoxFit.contain,
+                              key: ValueKey(_scannedImages[_currentImageIndex].path + _scannedImages[_currentImageIndex].lastModifiedSync().millisecondsSinceEpoch.toString()),
                             )
                           : const Center(
                               child: Text('No image'),
@@ -341,9 +349,12 @@ class _EditorScreenState extends State<EditorScreen> {
           // Editing Tools
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.appBarTheme.backgroundColor ?? Colors.white,
               border: Border(
-                top: BorderSide(color: Colors.grey[200]!, width: 1),
+                top: BorderSide(
+                  color: isDarkMode ? const Color(0xFF374151) : Colors.grey[200]!,
+                  width: 1,
+                ),
               ),
             ),
             child: SafeArea(
@@ -421,6 +432,7 @@ class _EditorScreenState extends State<EditorScreen> {
                                         child: Image.file(
                                           _scannedImages[index],
                                           fit: BoxFit.cover,
+                                          key: ValueKey(_scannedImages[index].path + _scannedImages[index].lastModifiedSync().millisecondsSinceEpoch.toString()),
                                         ),
                                       ),
                                       Positioned(
