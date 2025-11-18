@@ -112,7 +112,7 @@ class SettingsScreen extends StatelessWidget {
             Container(
               margin: const EdgeInsets.all(16),
               child: Card(
-                color: Colors.amber.shade50,
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -120,7 +120,7 @@ class SettingsScreen extends StatelessWidget {
                       Icon(
                         Icons.verified,
                         size: 48,
-                        color: Colors.amber.shade700,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -131,14 +131,14 @@ class SettingsScreen extends StatelessWidget {
                               'Premium Member',
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.amber.shade900,
+                                    color: Theme.of(context).colorScheme.onSecondaryContainer,
                                   ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Thank you for your support!',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.amber.shade900,
+                                    color: Theme.of(context).colorScheme.onSecondaryContainer,
                                   ),
                             ),
                           ],

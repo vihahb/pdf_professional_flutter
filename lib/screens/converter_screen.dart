@@ -207,11 +207,14 @@ class _ConverterScreenState extends State<ConverterScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.workspace_premium, color: Color(0xFF7C3AED)),
-            SizedBox(width: 8),
-            Text('Premium Feature'),
+            Icon(
+              Icons.workspace_premium,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            const SizedBox(width: 8),
+            const Text('Premium Feature'),
           ],
         ),
         content: const Text(
@@ -287,7 +290,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
     final conversions = context.watch<ConversionProvider>().conversions;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
       body: CustomScrollView(
         slivers: [
           // Header
@@ -295,33 +297,27 @@ class _ConverterScreenState extends State<ConverterScreen> {
             expandedHeight: 0,
             floating: true,
             pinned: true,
-            backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             automaticallyImplyLeading: false,
-            title: const Padding(
+            title: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'File Converter',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
-                    ),
+                    'PDF File Converter',
+                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                   ),
                   SizedBox(height: 2),
                   Text(
                     'Convert documents to and from PDF',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF6B7280),
-                      fontWeight: FontWeight.normal,
+                   style: Theme.of(context).textTheme.bodySmall,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -535,13 +531,12 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Choose a file from your device to convert',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Select a PDF File',
+                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -595,8 +590,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                   color: Colors.grey[600],
                                   fontSize: 13,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         TextButton(
@@ -701,17 +696,97 @@ class _ConverterScreenState extends State<ConverterScreen> {
                                           fontSize: 15,
                                           color: Colors.grey[900],
                                         ),
+                    return Builder(
+                      builder: (context) {
+                        final colorScheme = Theme.of(context).colorScheme;
+                        final textTheme = Theme.of(context).textTheme;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.outline.withValues(alpha: 0.3),
+                              width: isSelected ? 2 : 1,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: colorScheme.primary.withValues(alpha: 0.2),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                if (isLocked) {
+                                  _showPremiumDialog();
+                                } else {
+                                  setState(() {
+                                    _selectedFormat = option['id'] as String;
+                                  });
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? colorScheme.primary.withValues(alpha: 0.1)
+                                            : colorScheme.surfaceContainerHighest,
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        option['description'] as String,
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12,
-                                        ),
+                                      child: Icon(
+                                        option['icon'] as IconData,
+                                        color: isSelected
+                                            ? colorScheme.primary
+                                            : colorScheme.onSurfaceVariant,
+                                        size: 24,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            option['label'] as String,
+                                            style: textTheme.titleMedium?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            option['description'] as String,
+                                            style: textTheme.bodySmall,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (isLocked)
+                                      Icon(
+                                        Icons.lock,
+                                        color: colorScheme.secondary,
+                                        size: 20,
+                                      )
+                                    else if (isSelected)
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: colorScheme.primary,
+                                        size: 20,
+                                      ),
+                                  ],
                                 ),
                                 if (isLocked)
                                   const Icon(Icons.lock,
@@ -722,8 +797,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
                               ],
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   }),
                   const SizedBox(height: 16),
@@ -732,7 +807,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     child: FilledButton(
                       onPressed: _isConverting ? null : _convertFile,
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: _isConverting
@@ -740,7 +814,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
                                 strokeWidth: 2,
                               ),
                             )

@@ -130,7 +130,6 @@ class _PdfListScreenState extends State<PdfListScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
       body: CustomScrollView(
         slivers: [
           // Header with title and menu
@@ -138,7 +137,6 @@ class _PdfListScreenState extends State<PdfListScreen> {
             expandedHeight: 0,
             floating: true,
             pinned: true,
-            backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             automaticallyImplyLeading: false,
@@ -151,21 +149,15 @@ class _PdfListScreenState extends State<PdfListScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'PDF Master',
-                        style: TextStyle(
-                          fontSize: 18,
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F2937),
                         ),
                       ),
                       Text(
                         'Scan, Read & Convert',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.normal,
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
                   ),
@@ -176,14 +168,13 @@ class _PdfListScreenState extends State<PdfListScreen> {
                           context.watch<ThemeProvider>().isDarkMode
                               ? Icons.light_mode
                               : Icons.dark_mode,
-                          color: const Color(0xFF374151),
                         ),
                         onPressed: () {
                           context.read<ThemeProvider>().toggleTheme();
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.more_vert, color: Color(0xFF374151)),
+                        icon: const Icon(Icons.more_vert),
                         onPressed: () {
                           showModalBottomSheet(
                             context: context,
@@ -230,10 +221,13 @@ class _PdfListScreenState extends State<PdfListScreen> {
           SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: Theme.of(context).appBarTheme.backgroundColor,
                 border: Border(
-                  bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                  bottom: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 1,
+                  ),
                 ),
               ),
               child: TextField(
@@ -245,22 +239,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
                 },
                 decoration: InputDecoration(
                   hintText: 'Search PDFs...',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
-                  filled: true,
-                  fillColor: const Color(0xFFF3F4F6),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
-                  ),
+                  prefixIcon: const Icon(Icons.search, size: 20),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
@@ -377,7 +356,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
                     child: _QuickActionButton(
                       label: 'Scan Document',
                       icon: Icons.add,
-                      color: const Color(0xFF2563EB),
+                      isPrimary: true,
                       onTap: () => _pickPdfFile(context),
                     ),
                   ),
@@ -386,9 +365,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
                     child: _QuickActionButton(
                       label: 'My Files',
                       icon: Icons.folder_outlined,
-                      color: Colors.white,
-                      textColor: const Color(0xFF1F2937),
-                      borderColor: const Color(0xFFE5E7EB),
+                      isPrimary: false,
                       onTap: () {},
                     ),
                   ),
@@ -406,18 +383,14 @@ class _PdfListScreenState extends State<PdfListScreen> {
                 children: [
                   Text(
                     'Recent Files',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
-                    ),
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: const Text(
+                    child: Text(
                       'View All',
                       style: TextStyle(
-                        color: Color(0xFF2563EB),
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 14,
                       ),
                     ),
@@ -437,24 +410,17 @@ class _PdfListScreenState extends State<PdfListScreen> {
                         Icon(
                           Icons.picture_as_pdf_outlined,
                           size: 100,
-                          color: Colors.grey[300],
+                          color: Theme.of(context).disabledColor,
                         ),
                         const SizedBox(height: 24),
                         Text(
                           'No PDFs yet',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1F2937),
-                          ),
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Import or scan a document to get started',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
                     ),
@@ -516,48 +482,47 @@ class _PdfListScreenState extends State<PdfListScreen> {
 class _QuickActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
-  final Color color;
-  final Color? textColor;
-  final Color? borderColor;
+  final bool isPrimary;
   final VoidCallback onTap;
 
   const _QuickActionButton({
     required this.label,
     required this.icon,
-    required this.color,
-    this.textColor,
-    this.borderColor,
+    required this.isPrimary,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isWhite = color == Colors.white;
+    final colorScheme = Theme.of(context).colorScheme;
+    final backgroundColor = isPrimary ? colorScheme.primary : colorScheme.surface;
+    final foregroundColor = isPrimary ? colorScheme.onPrimary : colorScheme.onSurface;
+
     return Material(
-      color: color,
+      color: backgroundColor,
       borderRadius: BorderRadius.circular(16),
-      elevation: isWhite ? 0 : 2,
+      elevation: isPrimary ? 2 : 0,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: borderColor != null ? Border.all(color: borderColor!, width: 1) : null,
+            border: !isPrimary ? Border.all(color: colorScheme.outline, width: 1) : null,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
               Icon(
                 icon,
-                color: textColor ?? Colors.white,
+                color: foregroundColor,
                 size: 28,
               ),
               const SizedBox(height: 10),
               Text(
                 label,
                 style: TextStyle(
-                  color: textColor ?? Colors.white,
+                  color: foregroundColor,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -601,12 +566,15 @@ class _PdfCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -638,10 +606,8 @@ class _PdfCard extends StatelessWidget {
                               document.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                                color: Color(0xFF1F2937),
                               ),
                             ),
                           ),
@@ -653,24 +619,22 @@ class _PdfCard extends StatelessWidget {
                         children: [
                           Text(
                             _formatFileSize(document.size),
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 13,
-                            ),
+                            style: textTheme.bodySmall,
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.schedule, color: Colors.grey[500], size: 14),
+                          Icon(
+                            Icons.schedule,
+                            color: textTheme.bodySmall?.color,
+                            size: 14,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             _formatDate(document.createdAt),
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 12,
-                            ),
+                            style: textTheme.bodySmall,
                           ),
                         ],
                       ),
