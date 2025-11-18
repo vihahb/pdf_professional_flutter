@@ -96,11 +96,14 @@ class _ConverterScreenState extends State<ConverterScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.workspace_premium, color: Color(0xFF7C3AED)),
-            SizedBox(width: 8),
-            Text('Premium Feature'),
+            Icon(
+              Icons.workspace_premium,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            const SizedBox(width: 8),
+            const Text('Premium Feature'),
           ],
         ),
         content: const Text(
@@ -134,7 +137,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
     final isPremium = context.watch<PremiumProvider>().isPremium;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
       body: CustomScrollView(
         slivers: [
           // Header
@@ -142,33 +144,28 @@ class _ConverterScreenState extends State<ConverterScreen> {
             expandedHeight: 0,
             floating: true,
             pinned: true,
-            backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             automaticallyImplyLeading: false,
-            title: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'PDF Converter',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Builder(
+                builder: (context) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'PDF Converter',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Convert PDFs to different formats',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF6B7280),
-                      fontWeight: FontWeight.normal,
+                    const SizedBox(height: 2),
+                    Text(
+                      'Convert PDFs to different formats',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -241,125 +238,124 @@ class _ConverterScreenState extends State<ConverterScreen> {
 
                 // File Upload Section
                 if (_selectedFile == null)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey[300]!, width: 2, strokeAlign: BorderSide.strokeAlignInside),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _pickFile,
+                  Builder(
+                    builder: (context) => Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
-                        child: Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Column(
-                            children: [
-                              Icon(Icons.upload_file, size: 64, color: Colors.grey[400]),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Select a PDF File',
-                                style: TextStyle(
-                                  color: Colors.grey[900],
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline,
+                          width: 2,
+                          strokeAlign: BorderSide.strokeAlignInside,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _pickFile,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.upload_file,
+                                  size: 64,
+                                  color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Choose a file from your device to convert',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Select a PDF File',
+                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 20),
-                              FilledButton(
-                                onPressed: _pickFile,
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2563EB),
-                                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Choose a file from your device to convert',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  textAlign: TextAlign.center,
                                 ),
-                                child: const Text('Choose File'),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Free users: 3 conversions per day',
-                                style: TextStyle(
-                                  color: Colors.grey[500],
-                                  fontSize: 11,
+                                const SizedBox(height: 20),
+                                FilledButton(
+                                  onPressed: _pickFile,
+                                  style: FilledButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                                  ),
+                                  child: const Text('Choose File'),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Free users: 3 conversions per day',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   )
                 else
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[200]!),
-                    ),
-                    child: Row(
-                      children: [
-                        const Text('📄', style: TextStyle(fontSize: 32)),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _selectedFile!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
+                  Builder(
+                    builder: (context) => Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Text('📄', style: TextStyle(fontSize: 32)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _selectedFile!,
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '2.4 MB • 15 pages',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 13,
+                                const SizedBox(height: 4),
+                                Text(
+                                  '2.4 MB • 15 pages',
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedFile = null;
-                              _selectedFormat = null;
-                              _isComplete = false;
-                            });
-                          },
-                          child: const Text('Change'),
-                        ),
-                      ],
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedFile = null;
+                                _selectedFormat = null;
+                                _isComplete = false;
+                              });
+                            },
+                            child: const Text('Change'),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
                 // Conversion Options
                 if (_selectedFile != null && !_isComplete) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      'Select Output Format',
-                      style: TextStyle(
-                        color: Colors.grey[900],
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                  Builder(
+                    builder: (context) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        'Select Output Format',
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ),
                   ),
@@ -368,89 +364,103 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     final isPremiumOption = option['premium'] as bool;
                     final isLocked = isPremiumOption && !isPremium;
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFF2563EB) : Colors.grey[200]!,
-                          width: isSelected ? 2 : 1,
-                        ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: Colors.blue.withValues(alpha: 0.2),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            if (isLocked) {
-                              _showPremiumDialog();
-                            } else {
-                              setState(() {
-                                _selectedFormat = option['id'] as String;
-                              });
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? const Color(0xFF2563EB).withValues(alpha: 0.1)
-                                        : Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    option['icon'] as IconData,
-                                    color: isSelected ? const Color(0xFF2563EB) : Colors.grey[700],
-                                    size: 24,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        option['label'] as String,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                          color: Colors.grey[900],
-                                        ),
+                    return Builder(
+                      builder: (context) {
+                        final colorScheme = Theme.of(context).colorScheme;
+                        final textTheme = Theme.of(context).textTheme;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.outline.withValues(alpha: 0.3),
+                              width: isSelected ? 2 : 1,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: colorScheme.primary.withValues(alpha: 0.2),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                if (isLocked) {
+                                  _showPremiumDialog();
+                                } else {
+                                  setState(() {
+                                    _selectedFormat = option['id'] as String;
+                                  });
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? colorScheme.primary.withValues(alpha: 0.1)
+                                            : colorScheme.surfaceContainerHighest,
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        option['description'] as String,
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12,
-                                        ),
+                                      child: Icon(
+                                        option['icon'] as IconData,
+                                        color: isSelected
+                                            ? colorScheme.primary
+                                            : colorScheme.onSurfaceVariant,
+                                        size: 24,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            option['label'] as String,
+                                            style: textTheme.titleMedium?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            option['description'] as String,
+                                            style: textTheme.bodySmall,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (isLocked)
+                                      Icon(
+                                        Icons.lock,
+                                        color: colorScheme.secondary,
+                                        size: 20,
+                                      )
+                                    else if (isSelected)
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: colorScheme.primary,
+                                        size: 20,
+                                      ),
+                                  ],
                                 ),
-                                if (isLocked)
-                                  const Icon(Icons.lock, color: Color(0xFF7C3AED), size: 20)
-                                else if (isSelected)
-                                  const Icon(Icons.check_circle, color: Color(0xFF2563EB), size: 20),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   }),
                   const SizedBox(height: 16),
@@ -459,7 +469,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
                     child: FilledButton(
                       onPressed: _isConverting ? null : _convertFile,
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: _isConverting
@@ -467,7 +476,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
                                 strokeWidth: 2,
                               ),
                             )

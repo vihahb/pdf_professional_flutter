@@ -324,8 +324,11 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDarkMode ? const Color(0xFF000000) : const Color(0xFF1a1a1a);
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: backgroundColor,
       body: Column(
         children: [
           // Header
@@ -373,8 +376,8 @@ class _ScanDocumentScreenState extends State<ScanDocumentScreen>
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              const Color(0xFF1F2937),
-                              const Color(0xFF111827),
+                              backgroundColor.withValues(alpha: 0.9),
+                              backgroundColor,
                             ],
                           ),
                         ),
