@@ -6,6 +6,7 @@ import 'screens/home_screen.dart';
 import 'providers/pdf_provider.dart';
 import 'providers/premium_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/conversion_provider.dart';
 import 'services/ad_service.dart';
 import 'config/app_theme.dart';
 
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PdfProvider()),
         ChangeNotifierProvider(create: (_) => PremiumProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => ConversionProvider()),
         Provider(create: (_) => AdService()),
       ],
       builder: (context, child) {
