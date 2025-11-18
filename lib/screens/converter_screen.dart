@@ -30,7 +30,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       'label': 'DOCX to PDF',
       'description': 'Convert Word documents',
       'premium': false,
-      'extensions': ['docx', 'doc'],
+      'extensions': ['docx'],
     },
     {
       'id': 'excel_to_pdf',
@@ -38,7 +38,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       'label': 'Excel to PDF',
       'description': 'Convert spreadsheets',
       'premium': false,
-      'extensions': ['xlsx', 'xls'],
+      'extensions': ['xlsx'],
     },
   ];
 
@@ -77,7 +77,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
         // Pick DOCX or Excel files
         result = await FilePicker.platform.pickFiles(
           type: FileType.custom,
-          allowedExtensions: ['docx', 'doc', 'xlsx', 'xls'],
+          allowedExtensions: ['docx', 'xlsx'],
         );
       } else {
         // Pick PDF files
@@ -562,7 +562,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 _conversionMode == 'to_pdf'
-                                    ? 'Supported: .docx, .doc, .xlsx, .xls'
+                                    ? 'Supported: .docx, .xlsx'
                                     : 'Supported: .pdf',
                                 style: textTheme.bodySmall,
                                 textAlign: TextAlign.center,

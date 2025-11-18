@@ -13,6 +13,15 @@ class ConversionService {
   // Convert DOCX to PDF
   static Future<String> convertDocxToPdf(String docxPath) async {
     try {
+      // Validate file extension
+      final extension = docxPath.split('.').last.toLowerCase();
+      if (extension != 'docx') {
+        throw UnsupportedError(
+          'Unsupported Word format. Only .docx files are supported. '
+          'Please convert .doc files to .docx format first.',
+        );
+      }
+
       // Read the DOCX file
       final file = File(docxPath);
       final bytes = await file.readAsBytes();
@@ -116,6 +125,15 @@ class ConversionService {
   // Convert Excel to PDF
   static Future<String> convertExcelToPdf(String excelPath) async {
     try {
+      // Validate file extension
+      final extension = excelPath.split('.').last.toLowerCase();
+      if (extension != 'xlsx') {
+        throw UnsupportedError(
+          'Unsupported Excel format. Only .xlsx files are supported. '
+          'Please convert .xls files to .xlsx format first.',
+        );
+      }
+
       // Read the Excel file
       final file = File(excelPath);
       final bytes = await file.readAsBytes();
@@ -287,7 +305,7 @@ class ConversionService {
   // Check if file is supported
   static bool isSupportedFile(String filePath) {
     final extension = getFileExtension(filePath).toLowerCase();
-    return ['pdf', 'docx', 'xlsx', 'xls', 'doc'].contains(extension);
+    return ['pdf', 'docx', 'xlsx'].contains(extension);
   }
 
   // Get conversion type label
